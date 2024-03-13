@@ -27,7 +27,7 @@ public class Main {
         String method;
         String path;
         String httpVersion;
-        String response;
+        String response = null;
         for (int i = 0; i < 3; i++) {
             line = reader.readLine();
             log.info("read line:{}", line);
@@ -39,12 +39,12 @@ public class Main {
                 } else {
                     response = Constants.NOT_FOUND;
                 }
-                outputStream.write(response.getBytes(StandardCharsets.UTF_8));
-                outputStream.flush();
             } else if (i == 1) {
             } else if (i == 2) {
 
             }
         }
+        outputStream.write(response.getBytes(StandardCharsets.UTF_8));
+        outputStream.flush();
     }
 }
