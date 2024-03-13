@@ -47,5 +47,6 @@ public class Main {
         log.info("return {}", response);
         outputStream.write(response.getBytes(StandardCharsets.UTF_8));
         outputStream.flush();
+        outputStream.close();
     }
 }
