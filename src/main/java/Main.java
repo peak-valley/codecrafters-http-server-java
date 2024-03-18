@@ -9,7 +9,7 @@ import java.util.List;
 
 @Slf4j
 public class Main {
-    private static List<String> paths = List.of("/echo");
+    private static List<String> paths = List.of("/echo/");
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = null;
         Socket clientSocket = null;
@@ -36,15 +36,16 @@ public class Main {
                 String[] chunk = line.split(" ");
                 path = chunk[1];
                 boolean exist = false;
+                String prefixPath = "";
                 for (String s : paths) {
                     if (path.startsWith(s)) {
                         exist = true;
+                        prefixPath = s;
                         break;
                     }
                 }
                 if (exist) {
-                    int i1 = path.lastIndexOf("/");
-                    String pathParam = path.substring(i1 + 1);
+                    String pathParam = path.replace(prefixPath, "");
                     if (!pathParam.isEmpty()) {
                         data = pathParam;
                         break;
