@@ -18,7 +18,7 @@ public class RequestHandler {
 
         if (url.startsWith("/echo/")) {
             String pathParam = url.replace("/echo/", "");
-            out(pathParam, outputStream);
+            out(buildResponse(pathParam), outputStream);
         } else if ("/".equals(url)) {
             out(Constants.OK_RN, outputStream);
         } else if(url.startsWith("/user-agent")){
