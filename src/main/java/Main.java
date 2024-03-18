@@ -53,6 +53,11 @@ public class Main {
                     data = Constants.OK_RN;
                 } else {
                     data = Constants.NOT_FOUND;
+                    log.info("return {}", data);
+                    outputStream.write(data.getBytes(StandardCharsets.UTF_8));
+                    outputStream.flush();
+                    outputStream.close();
+                    return;
                 }
             } else if (i == 1) {
             } else if (i == 2) {
