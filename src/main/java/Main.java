@@ -72,8 +72,9 @@ public class Main {
     }
 
     private static String buildResponse(String response) {
+        int len = response.getBytes().length;
         String rst = Constants.OK + "Content-Type: " + Constants.TEXT_PLAIN + "\r\n"
-                + "Content-Length: " + response.length() + "\r\n\r\n" + response;
+                + "Content-Length: " + len + "\r\n\r\n" + response;
         return rst;
     }
 
