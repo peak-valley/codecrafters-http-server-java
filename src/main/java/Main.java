@@ -1,4 +1,6 @@
-import com.zyf.constant.Constants;
+import com.zyf.http.framework.HttpContext;
+import com.zyf.http.framework.RequestHandler;
+import com.zyf.http.framework.constant.Constants;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -9,7 +11,6 @@ import java.util.List;
 
 @Slf4j
 public class Main {
-    private static List<String> paths = List.of("/echo/");
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = null;
         Socket clientSocket = null;
@@ -24,59 +25,24 @@ public class Main {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
-        String method;
-        String path;
-        String httpVersion;
-        String params;
-        String data = null;
-        for (int i = 0; i < 3; i++) {
+
+        HttpContext httpContext = new HttpContext(outputStream);
+        // parse request line
+        httpContext.parseRequestMethod(reader.readLine());
+        // prase request headers
+        while (true) {
             line = reader.readLine();
-            log.info("read line:{}", line);
-            if (i == 0) {
-                String[] chunk = line.split(" ");
-                path = chunk[1];
-                boolean exist = false;
-                String prefixPath = "";
-                for (String s : paths) {
-                    if (path.startsWith(s)) {
-                        exist = true;
-                        prefixPath = s;
-                        break;
-                    }
-                }
-                if (exist) {
-                    String pathParam = path.replace(prefixPath, "");
-                    if (!pathParam.isEmpty()) {
-                        data = pathParam;
-                        break;
-                    }
-                } else if ("/".equals(path)) {
-                    data = Constants.OK_RN;
-                } else {
-                    data = Constants.NOT_FOUND;
-                    log.info("return {}", data);
-                    outputStream.write(data.getBytes(StandardCharsets.UTF_8));
-                    outputStream.flush();
-                    outputStream.close();
-                    return;
-                }
-            } else if (i == 1) {
-            } else if (i == 2) {
-
+            if (line == null || line.isEmpty()) {
+                break;
             }
+            httpContext.parseHttpHeaders(line);
         }
-        String response = buildResponse(data);
-        log.info("return {}", response);
-        outputStream.write(response.getBytes(StandardCharsets.UTF_8));
-        outputStream.flush();
-        outputStream.close();
+
+
+        RequestHandler requestHandler = new RequestHandler();
+        requestHandler.handle(httpContext);
     }
 
-    private static String buildResponse(String response) {
-        int len = response.getBytes().length;
-        String rst = Constants.OK + "Content-Type: " + Constants.TEXT_PLAIN + "\r\n"
-                + "Content-Length: " + len + "\r\n\r\n" + response;
-        return rst;
-    }
+
 
 }

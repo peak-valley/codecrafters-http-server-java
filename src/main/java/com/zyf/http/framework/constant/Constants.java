@@ -1,4 +1,4 @@
-package com.zyf.constant;
+package com.zyf.http.framework.constant;
 
 public interface Constants {
     String NOT_FOUND = "HTTP/1.1 404 Not Found\r\n\r\n";
