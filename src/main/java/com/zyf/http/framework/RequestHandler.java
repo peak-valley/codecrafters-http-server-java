@@ -36,13 +36,13 @@ public class RequestHandler {
         } else if(url.startsWith("/files/")) {
             String filename = url.replace("/files/", "");
             String filepath = HttpRepository.getConfig(Constants.DIRECTORY);
-            Path requestPath = Paths.get(filepath + "\\" + filename);
+            Path requestPath = Paths.get(filepath, filename);
             boolean exists = Files.exists(requestPath, LinkOption.NOFOLLOW_LINKS);
             if (exists) {
                 byte[] bytes = Files.readAllBytes(requestPath);
                 out(buildOctetStreamResponse(bytes));
             } else {
-                log.info("not found file:{}", filepath + "\\" + filename);
+                log.info("not found file:{}", filepath + filename);
             }
         }
         out(Constants.NOT_FOUND);

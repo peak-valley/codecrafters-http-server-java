@@ -37,7 +37,7 @@ public class Main {
             if (Constants.DIRECTORY.equals(args[i])) {
                 String filepath = args[++i];
                 log.info("set directory:{}", filepath);
-                HttpRepository.setConfig(args[i], filepath);
+                HttpRepository.setConfig(Constants.DIRECTORY, filepath);
             }
         }
     }
