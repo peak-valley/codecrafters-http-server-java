@@ -1,3 +1,4 @@
+import com.zyf.http.framework.HttpClient;
 import com.zyf.http.framework.HttpContext;
 import com.zyf.http.framework.RequestHandler;
 import com.zyf.http.framework.constant.Constants;
@@ -8,6 +9,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Slf4j
 public class Main {
@@ -17,30 +20,14 @@ public class Main {
 
         serverSocket = new ServerSocket(4221);
         serverSocket.setReuseAddress(true);
-        clientSocket = serverSocket.accept(); // Wait for connection from client.
-        System.out.println("accepted new connection");
 
-        OutputStream outputStream = clientSocket.getOutputStream();
-        InputStream inputStream = clientSocket.getInputStream();
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-        String line;
-
-        HttpContext httpContext = new HttpContext(outputStream);
-        // parse request line
-        httpContext.parseRequestMethod(reader.readLine());
-        // prase request headers
+        ExecutorService executorService = Executors.newCachedThreadPool();
         while (true) {
-            line = reader.readLine();
-            if (line == null || line.isEmpty()) {
-                break;
-            }
-            httpContext.parseHttpHeaders(line);
+            clientSocket = serverSocket.accept(); // Wait for connection from client.
+            System.out.println("accepted new connection");
+            HttpClient httpClient = new HttpClient(clientSocket);
+            executorService.execute(httpClient::execute);
         }
-
-
-        RequestHandler requestHandler = new RequestHandler();
-        requestHandler.handle(httpContext);
     }
 
 
