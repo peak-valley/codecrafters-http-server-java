@@ -3,13 +3,11 @@ package com.zyf.http.framework;
 import com.zyf.http.framework.constant.Constants;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.List;
 
 @Slf4j
@@ -23,6 +21,37 @@ public class RequestHandler {
     }
 
     public void handle() throws IOException {
+        Method method = httpContext.getMethod();
+        if (Method.GET.equals(method)) {
+            getHandle();
+        } else if (Method.POST.equals(method)) {
+            postHandle();
+        } else {
+            log.error("unsupported this method:{}", method);
+        }
+    }
+
+    public void postHandle() {
+        String url = httpContext.getUrl();
+
+        if (url.startsWith("/files/")) {
+            String filename = url.replace("/files/", "");
+            String filepath = HttpRepository.getConfig(Constants.DIRECTORY);
+            Path requestPath = Paths.get(filepath, filename);
+            try {
+//                Files.delete(requestPath);
+//                Files.createFile(requestPath);
+
+                OutputStream outputStream1 = Files.newOutputStream(requestPath);
+                outputStream1.write(httpContext.getBody());
+                outputStream1.close();
+            } catch (IOException e) {
+                log.error("handle /files/ failed,e:{},stack:{}", e.getMessage(), e.getStackTrace());
+            }
+        }
+    }
+
+    public void getHandle() throws IOException {
         String url = httpContext.getUrl();
 
         if (url.startsWith("/echo/")) {

@@ -8,26 +8,27 @@ import java.net.Socket;
 
 @Slf4j
 public class HttpClient {
-    private final InputStream inputStream;
+    private final InputStream is;
     private final OutputStream outputStream;
     Socket clientSocket;
 
     @SneakyThrows
     public HttpClient(Socket clientSocket) {
         this.clientSocket = clientSocket;
-        this.inputStream = clientSocket.getInputStream();
+        this.is = clientSocket.getInputStream();
         this.outputStream = clientSocket.getOutputStream();
     }
 
     public void execute() {
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+//        InputStreamReader in = new InputStreamReader(is);
+//        BufferedReader reader = new BufferedReader(in);
         String line;
 
         HttpContext httpContext = new HttpContext(outputStream);
         // parse request line
         try {
-            httpContext.parseRequestMethod(reader.readLine());
+            httpContext.parseRequestMethod(readLine());
         } catch (IOException e) {
             log.error("parse request line failed, e:{}", e.getMessage());
             return;
@@ -35,7 +36,7 @@ public class HttpClient {
         // prase request headers
         while (true) {
             try {
-                line = reader.readLine();
+                line = readLine();
             } catch (IOException e) {
                 log.error("parse request headers failed, e:{}", e.getMessage());
                 return;
@@ -46,6 +47,16 @@ public class HttpClient {
             httpContext.parseHttpHeaders(line);
         }
 
+        if (httpContext.getContentLength() > 0) {
+            try {
+                byte[] body = new byte[httpContext.getContentLength()];
+                int read = is.read(body, 0, httpContext.getContentLength());
+                log.info("read length:{}", read);
+                httpContext.setBody(body);
+            } catch (IOException e) {
+                log.error("read body failed, e:{}, stack:{}", e.getMessage(), e.getStackTrace());
+            }
+        }
 
         RequestHandler requestHandler = new RequestHandler(httpContext);
         try {
@@ -53,5 +64,21 @@ public class HttpClient {
         } catch (IOException e) {
             log.error("handle request failed, e:{}, stack:{}", e.getMessage(), e.getStackTrace());
         }
+    }
+
+    public String readLine() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        byte[] bytes = new byte[1];
+        int read;
+        while ((read = is.read(bytes, 0, 1)) > 0) {
+            if (bytes[0] == '\r') {
+                continue;
+            }
+            if (bytes[0] == '\n') {
+                break;
+            }
+            sb.append(new String(bytes));
+        }
+        return sb.toString();
     }
 }

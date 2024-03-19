@@ -1,6 +1,7 @@
 package com.zyf.http.framework;
 
 import lombok.Data;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.OutputStream;
@@ -12,7 +13,10 @@ public class HttpContext {
     private String userAgent;
     private String host;
     private Method method;
+    private int contentLength;
     private OutputStream outputStream;
+    @Setter
+    private byte[] body;
 
     public HttpContext(OutputStream outputStream) {
         this.outputStream = outputStream;
@@ -25,6 +29,8 @@ public class HttpContext {
             host = header;
         } else if ("User-Agent:".equals(header)) {
             userAgent = split[1];
+        } else if("Content-Length:".equals(header)){
+            contentLength = Integer.parseInt(split[1]);
         } else {
             log.info("unsupported parse line:{}", line);
         }
@@ -36,4 +42,5 @@ public class HttpContext {
         this.method = Method.getMethod(method);
         this.url = split[1];
     }
+
 }
