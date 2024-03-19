@@ -47,9 +47,9 @@ public class HttpClient {
         }
 
 
-        RequestHandler requestHandler = new RequestHandler();
+        RequestHandler requestHandler = new RequestHandler(httpContext);
         try {
-            requestHandler.handle(httpContext);
+            requestHandler.handle();
         } catch (IOException e) {
             log.error("handle request failed, e:{}, stack:{}", e.getMessage(), e.getStackTrace());
         }

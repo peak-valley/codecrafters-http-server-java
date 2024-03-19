@@ -5,4 +5,7 @@ public interface Constants {
     String OK_RN = "HTTP/1.1 200 OK\r\n\r\n";
     String OK = "HTTP/1.1 200 OK\r\n";
     String TEXT_PLAIN = "text/plain";
+    String APPLICATION_OCTET_STREAM = "application/octet-stream";
+
+    String DIRECTORY = "--directory";
 }

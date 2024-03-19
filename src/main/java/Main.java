@@ -1,5 +1,6 @@
 import com.zyf.http.framework.HttpClient;
 import com.zyf.http.framework.HttpContext;
+import com.zyf.http.framework.HttpRepository;
 import com.zyf.http.framework.RequestHandler;
 import com.zyf.http.framework.constant.Constants;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import java.util.concurrent.Executors;
 @Slf4j
 public class Main {
     public static void main(String[] args) throws IOException {
+        parseArgs(args);
         ServerSocket serverSocket = null;
         Socket clientSocket = null;
 
@@ -27,6 +29,14 @@ public class Main {
             System.out.println("accepted new connection");
             HttpClient httpClient = new HttpClient(clientSocket);
             executorService.execute(httpClient::execute);
+        }
+    }
+
+    public static void parseArgs(String[] args) {
+        for (int i = 0; i < args.length; i++) {
+            if (Constants.DIRECTORY.equals(args[i])) {
+                HttpRepository.setConfig(args[i], args[++i]);
+            }
         }
     }
 
