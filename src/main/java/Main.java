@@ -35,7 +35,9 @@ public class Main {
     public static void parseArgs(String[] args) {
         for (int i = 0; i < args.length; i++) {
             if (Constants.DIRECTORY.equals(args[i])) {
-                HttpRepository.setConfig(args[i], args[++i]);
+                String filepath = args[++i];
+                log.info("set directory:{}", filepath);
+                HttpRepository.setConfig(args[i], filepath);
             }
         }
     }

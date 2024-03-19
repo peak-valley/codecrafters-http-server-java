@@ -14,7 +14,6 @@ import java.util.List;
 
 @Slf4j
 public class RequestHandler {
-    private final static List<String> paths = List.of("/echo/", "/user-agent");
     private final OutputStream outputStream;
     private final HttpContext httpContext;
 
@@ -42,6 +41,8 @@ public class RequestHandler {
             if (exists) {
                 byte[] bytes = Files.readAllBytes(requestPath);
                 out(buildOctetStreamResponse(bytes));
+            } else {
+                log.info("not found file:{}", filepath + "\\" + filename);
             }
         }
         out(Constants.NOT_FOUND);
