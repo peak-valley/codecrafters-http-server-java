@@ -31,7 +31,7 @@ public class RequestHandler {
         }
     }
 
-    public void postHandle() {
+    public void postHandle() throws IOException {
         String url = httpContext.getUrl();
 
         if (url.startsWith("/files/")) {
@@ -39,15 +39,16 @@ public class RequestHandler {
             String filepath = HttpRepository.getConfig(Constants.DIRECTORY);
             Path requestPath = Paths.get(filepath, filename);
             try {
-//                Files.delete(requestPath);
-//                Files.createFile(requestPath);
-
                 OutputStream outputStream1 = Files.newOutputStream(requestPath);
                 outputStream1.write(httpContext.getBody());
                 outputStream1.close();
+
+                out(Constants.CREATED_RN);
             } catch (IOException e) {
                 log.error("handle /files/ failed,e:{},stack:{}", e.getMessage(), e.getStackTrace());
             }
+        } else {
+            out(Constants.NOT_FOUND);
         }
     }
 
@@ -72,9 +73,11 @@ public class RequestHandler {
                 out(buildOctetStreamResponse(bytes));
             } else {
                 log.info("not found file:{}", filepath + filename);
+                out(Constants.NOT_FOUND);
             }
+        } else {
+            out(Constants.NOT_FOUND);
         }
-        out(Constants.NOT_FOUND);
     }
 
     private void out(String data) throws IOException {
